@@ -1,0 +1,2 @@
+sudo ./pi_fm_rds -audio audio1.wav -freq 101.1
+sudo ./pi_fm_rds -audio audio2.wav -freq 103.6
