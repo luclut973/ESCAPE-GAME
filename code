@@ -1,0 +1,91 @@
+#include <SPI.h>
+#include <MFRC522.h>
+#include <DHT.h>
+
+// Définition des broches
+#define IR_RECEIVE_PIN 4        // Pin pour la télécommande IR
+#define RFID_SS_PIN 10          // Pin SS pour le lecteur RFID
+#define RFID_RST_PIN 9          // Pin RST pour le lecteur RFID
+#define DHT_PIN 2               // Pin pour le capteur DHT11
+#define DHTTYPE DHT11           // Type du capteur DHT
+
+// Initialisations des objets
+IRrecv irrecv(IR_RECEIVE_PIN);
+decode_results results;
+MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);
+DHT dht(DHT_PIN, DHTTYPE);
+
+// Variables de suivi
+bool gameStarted = false;       // Jeu démarré
+bool badgeScanned = false;      // Badge RFID scanné
+bool tempValidated = false;     // Température validée
+
+void setup() {
+  Serial.begin(9600);
+
+  // Initialisation des modules
+  irrecv.enableIRIn();      // Active le récepteur IR
+  SPI.begin();              // Initialise la communication SPI
+  rfid.PCD_Init();          // Initialise le lecteur RFID
+  dht.begin();              // Initialise le capteur DHT11
+
+  Serial.println("Appuyez sur la télécommande");
+}
+
+void loop() {
+  if (!gameStarted) {
+    // Étape 1 : Attente de l'appui sur le bouton '#'
+    if (irrecv.decode()) {
+      Serial.print("Code reçu : ");
+      Serial.println(irrecv.decodedIRData.command);
+
+      if (irrecv.decodedIRData.command == 74) { // Code IR pour le bouton #
+        gameStarted = true;
+        Serial.println("Jeu démarré !");
+        Serial.println("10.122.4.118/JPO_CTF/secret_gallery/");
+        delay(1000);
+        
+      }
+      irrecv.resume();
+    }
+  } 
+  else if (!badgeScanned) {
+    // Étape 2 : Attente du scan du badge RFID
+    if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
+      Serial.print("Badge détecté, UID : ");
+      String uid = "";
+      for (byte i = 0; i < rfid.uid.size; i++) {
+        uid += String(rfid.uid.uidByte[i], HEX);
+      }
+      Serial.println(uid);
+      badgeScanned = true;
+      delay(1000);
+      
+    }
+  } 
+  else if (!tempValidated) {
+    // Étape 3 : Lecture de la température
+    float temperature = dht.readTemperature();
+
+    // Vérification de la lecture
+    if (isnan(temperature)) {
+      Serial.println("Erreur : Impossible de lire la température !");
+      delay(2000);
+      return;
+    }
+
+    // Affichage de la température en temps réel
+    Serial.print("Température actuelle : ");
+    Serial.print(temperature);
+    Serial.println(" °C");
+
+    // Vérifie si la température atteint le seuil
+    if (temperature >= 31.0) {
+      Serial.println("Température validée !");
+      Serial.println("CODE SECRET : 967823"); // Affiche le code secret
+      tempValidated = true;
+    }
+
+    delay(2000); // Pause avant la prochaine lecture
+  }
+}
