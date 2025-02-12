@@ -50,7 +50,7 @@ En participant à cet escape game, vous plongerez dans un univers où chaque ind
   - Valider l'étape si la température atteint un seuil prédéfini (32°C dans ce scénario).
 - **Implémentation :**
   - La température est mesurée en temps réel et affichée dans le moniteur série.
-  - Une fois le seuil atteint, un code secret (« 994422 ») est affiché pour avancer.
+  - Une fois le seuil atteint, un code secret (« 967823 ») est affiché pour avancer.
 
 #### 4. **Microcontrôleur Arduino**
 - **Modèle utilisé :** Arduino Uno.
