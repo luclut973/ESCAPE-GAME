@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge - Marche Froide !!!</title>
+    <style>
+        body {
+            background-color: black;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            overflow: hidden;
+        }
+        .matrix {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: black;
+            z-index: -1;
+        }
+        .glitch {
+            font-size: 90px;
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: glitch 0.8s infinite;
+        }
+        @keyframes glitch {
+            0% { text-shadow: 4px 4px red; }
+            25% { text-shadow: -4px -4px cyan; }
+            50% { text-shadow: 4px -4px lime; }
+            75% { text-shadow: -4px 4px yellow; }
+            100% { text-shadow: 4px 4px red; }
+        }
+        .input-section {
+            margin-top: 20px;
+        }
+        input {
+            background: black;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            font-size: 20px;
+            padding: 10px;
+            text-align: center;
+        }
+        button {
+            margin-top: 10px;
+            background: black;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            font-size: 20px;
+            padding: 10px 20px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #00ff00;
+            color: black;
+            box-shadow: 0 0 20px red;
+        }
+        .error {
+            display: none;
+            font-size: 40px;
+            margin-top: 20px;
+            animation: glitch 1s infinite;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <canvas class="matrix"></canvas>
+    <h1 class="glitch">Challenge - Marche Froide !!!</h1>
+    <div class="input-section">
+        <input type="text" id="code" placeholder="Entrez le code...">
+        <button onclick="validateCode()">Valider</button>
+    </div>
+    <div class="error" id="errorMessage">ACCÈS REFUSÉ. ESSAYEZ ENCORE.</div>
+
+    <script>
+        const canvas = document.querySelector('.matrix');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const letters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 18;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff00';
+            ctx.font = `${fontSize}px monospace`;
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 50);
+
+        function validateCode() {
+            event.preventDefault();
+            const code = document.getElementById('code').value;
+            if (code === '967823') {
+                window.location.href = 'canal.html';
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
